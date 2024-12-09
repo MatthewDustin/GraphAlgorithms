@@ -5,10 +5,10 @@ from GUI2 import *
 #_graph = Graph(node_count = 300, density=15, directed=False)
 
 
-DEFAULT_NODECOUNT = 10
+DEFAULT_NODECOUNT = 100
 DEFAULT_DENSITY = 4
 DEFAULT_DIRECTED = False
-DEFAULT_SEED = 1
+DEFAULT_SEED = None
 
 def testGUI(
         node_count = DEFAULT_NODECOUNT, 
@@ -18,15 +18,6 @@ def testGUI(
     gui = GraphUI()
     gui.create_graph_no_GUI(node_count, density, directed, seed)
     gui.render_graph()
-
-def testKruskal(
-        node_count = DEFAULT_NODECOUNT, 
-        density = DEFAULT_DENSITY,
-        seed = DEFAULT_SEED):
-    G = Graph(node_count, density, seed=seed)
-    G.generateConnectedGraph()
-    G.randomizeWeights()
-    print(G.kruskal())
     
 def testWeights(
         node_count = DEFAULT_NODECOUNT, 
@@ -55,17 +46,23 @@ def testSorts(
     print(G.getSortedEdges())
 
 def testFloydWarshall(
-        node_count = DEFAULT_NODECOUNT, 
         density = DEFAULT_DENSITY,
         seed = DEFAULT_SEED):
-    gui = GraphUI()
-    gui.create_graph_no_GUI(node_count, density, directed=False, seed=seed)
+    
+    def testForNodeCount(node_count):
+        G = Graph(node_count, density)
+        G.generateConnectedGraph()
+        nets = nx.floyd_warshall_numpy(G.G).tolist()
+        warshall = G.floydWarshall()[1]
+        if warshall != nets: print(f"Failed with node_cout = {node_count}")
 
-    c = gui.graph.floydWarshall()
+    # for i in range(2, 9):
+    #     testForNodeCount(i)
+    for i in range(10, 1000, 100):
+        testForNodeCount(i)
 
-    Graph.getShortestPath(5, 1, c)
-
-    gui.render_graph()
+    print("Finished testFloydWarshall")
+    
 
 def testConnectedComponents(
         node_count = DEFAULT_NODECOUNT, 
@@ -73,27 +70,45 @@ def testConnectedComponents(
         seed = DEFAULT_SEED):
     G = Graph(node_count, density, seed=seed)
     G.generateRandomGraph()
+    print(f"Number of connected components: {nx.number_connected_components(G.G)}")
     print(f"Number of connected components: {G.countConnectedComponents()}")
 
-    
+
 def testVertexCover(
     node_count = DEFAULT_NODECOUNT, 
         density = DEFAULT_DENSITY,
         seed = DEFAULT_SEED):
+    G = Graph(node_count, density, seed=seed)
+    G.generateRandomGraph()
 
-    gui = GraphUI()
-    gui.create_graph_no_GUI(node_count, density, directed=False, seed=seed)
-    gui.graph.vertexCover()
-    gui.render_graph()
+    cover = G.vertexCover()
+    if not nx.algorithms.is_vertex_cover(G.G, cover): 
+        print("FAILED: Not a vertex cover")
+        return
+
+
+def testKruskal(
+        node_count = DEFAULT_NODECOUNT, 
+        density = DEFAULT_DENSITY,
+        seed = DEFAULT_SEED):
+    
+    G = Graph(node_count, density, seed=seed)
+    G.generateConnectedGraph()
+    G.randomizeWeights()
+    nets = nx.minimum_spanning_tree(G.G)
+    kruskals = G.kruskal()
+    print(f'networkx: {sorted(nets.edges)}')
+    print(f'kruskals: {sorted(kruskals.edges)}')
 
 
 
 
+# testConnectedComponents()
 # testSorts()
 # testWeights()
 # testKruskal()
-testFloydWarshall()
-# testVertexCover(seed = None)
+# testFloydWarshall()
+testVertexCover(seed = None)
 
 
 #print(nx.write_network_text(_graph.G))

@@ -74,8 +74,8 @@ class GraphUI(tk.Tk):
         v = simpledialog.askinteger("Input", "Enter ending node (v):")
 
         if u is not None and v is not None:
-            nodeChains = self.graph.floydWarshall()
-            Graph.getShortestPath(u, v, nodeChains)
+            warshall = self.graph.floydWarshall()
+            Graph.getShortestPath(u, v, warshall[0])
 
     def delete_edge(self):
         if self.graph is None:
