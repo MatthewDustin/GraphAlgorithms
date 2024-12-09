@@ -41,6 +41,7 @@ class GraphUI(tk.Tk):
             return
 
         self.graph = Graph(node_count, density, directed)
+        self.graph.generateRandomGraph()
         if random_weights: 
             self.graph.randomizeWeights()
 
