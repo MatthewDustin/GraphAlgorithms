@@ -124,10 +124,10 @@ class Graph:
 
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
         k = nodeChains[start][end]
-        print(start)
+        print("Start: " + start)
         if k==start:
-            print(k)
-            print(end)
+            print("Total Weight: " + k)
+            print("End: " + end)
         else:
             Graph.getShortestPath(k, end, nodeChains)
 
@@ -183,7 +183,4 @@ class Graph:
 
         '''Count all roots. Creating a set is unnecessary.'''
         return sum(1 for node in rangeNodeCount if root[node] == node)
-                     
-                    
-                    
-        
+    
