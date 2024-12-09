@@ -86,8 +86,11 @@ class Graph:
             return spanningTree
     
     def floydWarshall(self):
-        pathWeights = [[math.inf for x in range(self.node_count)] for a in range(self.node_count)]
-        nodeChains = [[-1 for x in range(self.node_count)] for a in range(self.node_count)]
+
+        K = self.G.to_directed()
+        R = range(K.number_of_nodes())
+        pathWeights = [[math.inf for x in R] for a in R]
+        nodeChains = [[-1 for x in R] for a in R]
         # arr[:][:] = math.inf
 
         def printArrArr(array: list[list[float]]):
@@ -100,30 +103,31 @@ class Graph:
                     if j == len(array)-1:
                         print()        
 
-        for (s, d, w) in self.G.edges.data("weight"):
+        for (s, d, w) in K.edges.data("weight"):
             #initialize weights for directly connected nodes
             #mirrors diagonally since we're using an undirected graph
-            pathWeights[d][s] = pathWeights[s][d] = w
+            pathWeights[s][d] = w
             #initialize existing direct paths
             nodeChains[s][d] = s
+            nodeChains[d][s] = d
         
-        for i in range(self.node_count):
+        for i in R:
             #weight from a node to itself is 0
             pathWeights[i][i] = 0
             #path from a node to itself is direct
             nodeChains[i][i] = i
 
         #iterate through potential intermedary nodes
-        for inter in range(self.node_count):
+        for inter in R:
             #iterate through all source and destination node combinations
-            for src in range(self.node_count):
-                for dest in range(self.node_count):
+            for src in R:
+                for dest in R:
                     #get weight of path from source to intermediary node to destination
                     compoundPath = pathWeights[src][inter] + pathWeights[inter][dest]
                     #if path through intermediary node has a lower weight, update it
                     if pathWeights[src][dest] > compoundPath:
                         #mirrors diagonally since we're using an undirected graph
-                        pathWeights[src][dest] = pathWeights[dest][src] = compoundPath
+                        pathWeights[src][dest] = compoundPath
                         #
                         nodeChains[src][dest] = nodeChains[inter][dest]
 
@@ -134,13 +138,13 @@ class Graph:
         return nodeChains
 
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
-        k = nodeChains[start][end]
-        print("Start: " + start)
-        if k==start:
-            print("Total Weight: " + k)
-            print("End: " + end)
-        else:
-            Graph.getShortestPath(k, end, nodeChains)
+        print(f"Shortest path from {start} to {end}")
+        trace = [end]
+        while start != end:
+            end = nodeChains[start][end]
+            trace.insert(0, end)
+
+        print(trace)
         
         
 
