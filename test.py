@@ -67,7 +67,13 @@ def testFloydWarshall(
 
     gui.render_graph()
 
-
+def testConnectedComponents(
+        node_count = DEFAULT_NODECOUNT, 
+        density = DEFAULT_DENSITY,
+        seed = DEFAULT_SEED):
+    G = Graph(node_count, density, seed=seed)
+    G.generateRandomGraph()
+    print(f"Number of connected components: {G.countConnectedComponents()}")
 
 
 
