@@ -90,37 +90,48 @@ class Graph:
         nodeChains = [[-1 for x in range(self.node_count)] for a in range(self.node_count)]
         # arr[:][:] = math.inf
 
+        def printArrArr(array: list[list[float]]):
+            for i in range(len(array)):
+                for j in range(len(array)):
+                    if(array[i][j] == math.inf):
+                        print("%5s" % ("IF"), end="")
+                    else:
+                        print("%5d" % (array[i][j]), end="")
+                    if j == len(array)-1:
+                        print()        
+
         for (s, d, w) in self.G.edges.data("weight"):
+            #initialize weights for directly connected nodes
+            #mirrors diagonally since we're using an undirected graph
             pathWeights[d][s] = pathWeights[s][d] = w
+            #initialize existing direct paths
             nodeChains[s][d] = s
+        
         for i in range(self.node_count):
+            #weight from a node to itself is 0
             pathWeights[i][i] = 0
+            #path from a node to itself is direct
             nodeChains[i][i] = i
 
+        #iterate through potential intermedary nodes
         for inter in range(self.node_count):
+            #iterate through all source and destination node combinations
             for src in range(self.node_count):
                 for dest in range(self.node_count):
+                    #get weight of path from source to intermediary node to destination
                     compoundPath = pathWeights[src][inter] + pathWeights[inter][dest]
+                    #if path through intermediary node has a lower weight, update it
                     if pathWeights[src][dest] > compoundPath:
-                        pathWeights[src][dest]= compoundPath
-                        pathWeights[dest][src]= compoundPath
-                        nodeChains[src][dest]= nodeChains[inter][dest]
+                        #mirrors diagonally since we're using an undirected graph
+                        pathWeights[src][dest] = pathWeights[dest][src] = compoundPath
+                        #
+                        nodeChains[src][dest] = nodeChains[inter][dest]
 
-        Graph.printArrArr(pathWeights)
+        printArrArr(pathWeights)
         print()
-        Graph.printArrArr(nodeChains)
+        printArrArr(nodeChains)
 
         return nodeChains
-        
-    def printArrArr(array: list[list[float]]):
-        for i in range(len(array)):
-            for j in range(len(array)):
-                if(array[i][j] == math.inf):
-                    print("%5s" % ("IF"), end="")
-                else:
-                    print("%5d" % (array[i][j]), end="")
-                if j == len(array)-1:
-                    print()        
 
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
         k = nodeChains[start][end]
@@ -130,6 +141,52 @@ class Graph:
             print("End: " + end)
         else:
             Graph.getShortestPath(k, end, nodeChains)
+        
+        
+
+    def vertexCover(self):
+        vertices = set()
+        remainingEdges = set(self.G.edges)
+        #coveredEdges = set() #Just for tracking, should not be needed for logic
+        #coveredNodes = list()
+
+        def uncoveredEdges(node: int):
+            uncoveredEdges = [edge for edge in remainingEdges if node in edge]
+            return uncoveredEdges
+        
+        #first adds the incident node with the greater number of uncovered incident edges
+        #if the next node still has uncovered edges it is added as well
+        def addOptimalNodes(edge: tuple):
+            if len(uncoveredEdges(edge[0])) < len(uncoveredEdges(edge[1])): 
+                edge = (edge[1], edge[0])
+            
+            vertices.add(edge[0])
+            #coveredNodes.append(edge[0])
+            #removeCoveredEdges can be called before including the node because it wont remove anything if the node shouldn't be included
+            #avoids including the node when it wouldn't cover any new edges, e.g. leaf nodes
+            if removeCoveredEdges(edge[1]) > 0:
+                vertices.add(edge[1])
+        
+        #removes from remainingEdges any edge that is covered by the node provided
+        #returns the number of new edges covered
+        def removeCoveredEdges(node: int):
+            covers = [e for e in remainingEdges if node in e]
+            remainingEdges.difference_update(covers)
+            #coveredEdges.update(covers)
+            #if len(covers) > 0: print(f"removing: {covers}")
+            return len(covers)
+
+        while len(remainingEdges) > 0:
+            edge = remainingEdges.pop()
+            
+            #print(edge)
+
+            addOptimalNodes(edge)
+
+            #print(f"edge: {edge} \nremainingEdges: {remainingEdges}")
+            #print(f"coveredNodes: {coveredNodes}")            
+
+        print(vertices)
 
     def countConnectedComponents(self):
         visited = set()

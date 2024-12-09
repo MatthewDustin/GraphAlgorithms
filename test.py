@@ -75,14 +75,25 @@ def testConnectedComponents(
     G.generateRandomGraph()
     print(f"Number of connected components: {G.countConnectedComponents()}")
 
+    
+def testVertexCover(
+    node_count = DEFAULT_NODECOUNT, 
+        density = DEFAULT_DENSITY,
+        seed = DEFAULT_SEED):
+
+    gui = GraphUI()
+    gui.create_graph_no_GUI(node_count, density, directed=False, seed=seed)
+    gui.graph.vertexCover()
+    gui.render_graph()
+
 
 
 
 # testSorts()
 # testWeights()
 # testKruskal()
-#testFloydWarshall()
 testFloydWarshall()
+# testVertexCover(seed = None)
 
 
 #print(nx.write_network_text(_graph.G))
