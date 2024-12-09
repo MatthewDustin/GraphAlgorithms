@@ -131,7 +131,58 @@ class Graph:
         else:
             Graph.getShortestPath(k, end, nodeChains)
 
+    def countConnectedComponents(self):
+        visited = set()
+        components = 0
 
+        def dfs(node):
+            visited.add(node)
+            for neighbor in self.G.neighbors(node):
+                if neighbor not in visited:
+                    dfs(neighbor)
+        
+        for node in self.G.nodes:
+            if node not in visited:
+                components += 1
+                dfs(node)
+        
+        return components
+
+    def countConnectedComponentsDSU(self):
+        """This algorithm uses Disjoint Set Union. Each node starts as a tree root."""
+        rangeNodeCount = range(self.node_count)
+        root = list(rangeNodeCount)
+        depth = [0] * self.node_count
+
+        def find(node):
+            """Find also performs path compression using the assignment. This makes the tree flat and the find operation O(1) amortized."""
+            if root[node] != node:
+                root[node] = find(root[node])
+            return root[node]
+
+        def union(node1, node2):
+            root1 = find(node1)
+            root2 = find(node2)
+
+            if root1 != root2:
+                '''Attach the smaller tree to the root of the larger tree'''
+                if depth[root1] > depth[root2]:
+                    root[root2] = root1
+                elif depth[root1] < depth[root2]:
+                    root[root1] = root2
+                else:
+                    depth[root1] += 1
+                    root[root2] = root1
+
+        for u, v in self.G.edges:
+            union(u, v)
+
+        '''Not all trees are flat, so we repeat the find operation on all nodes'''
+        for node in rangeNodeCount:
+            root[node] = find(node)
+
+        '''Count all roots. Creating a set is unnecessary.'''
+        return sum(1 for node in rangeNodeCount if root[node] == node)
                      
                     
                     
