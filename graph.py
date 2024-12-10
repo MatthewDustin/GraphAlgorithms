@@ -3,6 +3,8 @@ import math
 import random
 import time
 
+import numpy as np
+
 class Graph:
   
     def __init__(self, node_count: int, density=1 , directed=False, seed: int | None = None):
@@ -98,42 +100,36 @@ class Graph:
         return nx.minimum_spanning_tree(self.G)
     
     def floydWarshall(self):
+        # Get nodes and initialize indices
+        nodes = list(self.G.nodes())
+        num_nodes = len(nodes)
+        node_indices = {node: idx for idx, node in enumerate(nodes)}
 
-        K = self.G.to_directed()
-        R = range(K.number_of_nodes())
-        pathWeights = [[math.inf for x in R] for a in R]
-        nodeChains = [[-1 for x in R] for a in R]
-        # arr[:][:] = math.inf
+        # Initialize path weights and node chains
+        pathWeights = [[math.inf] * num_nodes for _ in range(num_nodes)]
+        nodeChains = [[-1] * num_nodes for _ in range(num_nodes)]
 
-        for (s, d, w) in K.edges.data("weight"):
-            #initialize weights for directly connected nodes
-            #mirrors diagonally since we're using an undirected graph
-            pathWeights[s][d] = w
-            #initialize existing direct paths
-            nodeChains[s][d] = s
-            nodeChains[d][s] = d
-        
-        for i in R:
-            #weight from a node to itself is 0
+        # Set weights from edges
+        for s, d, w in self.G.edges.data("weight", default=math.inf):
+            s_idx, d_idx = node_indices[s], node_indices[d]
+            pathWeights[s_idx][d_idx] = w
+            nodeChains[s_idx][d_idx] = s_idx
+
+        # Set diagonal to zero
+        for i in range(num_nodes):
             pathWeights[i][i] = 0
-            #path from a node to itself is direct
             nodeChains[i][i] = i
 
-        #iterate through potential intermedary nodes
-        for inter in R:
-            #iterate through all source and destination node combinations
-            for src in R:
-                for dest in R:
-                    #get weight of path from source to intermediary node to destination
-                    compoundPath = pathWeights[src][inter] + pathWeights[inter][dest]
-                    #if path through intermediary node has a lower weight, update it
-                    if pathWeights[src][dest] > compoundPath:
-                        #mirrors diagonally since we're using an undirected graph
-                        pathWeights[src][dest] = compoundPath
-                        #
-                        nodeChains[src][dest] = nodeChains[inter][dest]
+        # Floyd-Warshall algorithm
+        for k in range(num_nodes):
+            for i in range(num_nodes):
+                for j in range(num_nodes):
+                    compoundPath = pathWeights[i][k] + pathWeights[k][j]
+                    if pathWeights[i][j] > compoundPath:
+                        pathWeights[i][j] = compoundPath
+                        nodeChains[i][j] = nodeChains[k][j]
 
-        return (nodeChains, pathWeights)
+        return nodeChains, pathWeights
 
     def floysWarshallNX(self):
         return nx.floyd_warshall_numpy(self.G, weight='weight')
@@ -249,3 +245,18 @@ class Graph:
     
     def countConnectedComponentsNX(self):
         return nx.number_connected_components(self.G)
+    
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(50, density=2, seed=(i + 37), directed=True)
+    graph.generateRandomGraph()
+    graph.randomizeWeights()
+    graph.floydWarshall()
+print("--- %s seconds ---" % (time.time() - start_time))
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(50, density=2, seed=(i + 37), directed=True)
+    graph.generateRandomGraph()
+    graph.randomizeWeights()
+    graph.floysWarshallNX()
+print("--- %s seconds ---" % (time.time() - start_time))
