@@ -149,13 +149,14 @@ class Graph:
         return nx.floyd_warshall_numpy(self.G, weight='weight')
 
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
-        print(f"Shortest path from {start} to {end}")
+        #print(f"Shortest path from {start} to {end}")
         trace = [end]
         while start != end:
             end = nodeChains[start][end]
             trace.insert(0, end)
 
-        print(trace)
+        return trace
+
         
         
 
