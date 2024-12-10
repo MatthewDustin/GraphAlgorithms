@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import mplcursors
 from graph import *
 
-# Assuming Edge and Graph classes are defined here or imported from another module
 
 class GraphUI(tk.Tk):
     def __init__(self):
@@ -15,7 +14,6 @@ class GraphUI(tk.Tk):
 
         self.graph = None
 
-        # Create UI components
         self.create_widgets()
 
     def create_widgets(self):
@@ -24,7 +22,7 @@ class GraphUI(tk.Tk):
         tk.Button(self, text="Add Edge", command=self.add_edge).pack(pady=5)
         tk.Button(self, text="Delete Edge", command=self.delete_edge).pack(pady=5)
         tk.Button(self, text="Edit Weight", command=self.edit_weight).pack(pady=5)
-        tk.Button(self, text="Render Graph", command=self.render_graph).pack(pady=5)  # New button to render graph
+        tk.Button(self, text="Render Graph", command=self.render_graph).pack(pady=5)
         tk.Button(self, text="Shortest Path", command = self.get_shortest_path).pack(pady=5)
         tk.Button(self, text="Exit", command=self.quit).pack(pady=5)
 
@@ -126,24 +124,18 @@ class GraphUI(tk.Tk):
         cmap = plt.get_cmap('coolwarm')  # Blue to red colormap
         edge_colors = [cmap(norm) for norm in normal_weights]  
 
-        # Create a new figure and axis
         fig, ax = plt.subplots()
 
-        # Draw nodes and edges
         nx.draw(self.graph.G, pos, with_labels=True, node_size=700, node_color='lightblue', ax=ax)
         edges = nx.draw_networkx_edges(self.graph.G, pos, edge_color=edge_colors, width=2, ax=ax)
 
-        # Create a color legend
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min_weight, vmax=max_weight))
         sm.set_array([])
         plt.colorbar(sm, ax=ax, label='Edge Weight')
 
-
-        # Create tooltips for edges
         edge_labels = [(u, v) for u, v in self.graph.G.edges()]
-        cursor = mplcursors.cursor(edges, hover=True)
+        cursor = mplcursors.cursor(edges, hover=2)
 
-        # Set tooltip text on hover
         cursor.connect("add", lambda sel: sel.annotation.set_text(
             f"Weight: {self.graph.G[edge_labels[sel.index[0]][0]][edge_labels[sel.index[0]][1]]['weight']}\nEdge: {edge_labels[sel.index[0]][0]} -- {edge_labels[sel.index[0]][1]}"
         ))
