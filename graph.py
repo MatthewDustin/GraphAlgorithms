@@ -101,9 +101,8 @@ class Graph:
     
     def floydWarshall(self):
         # Get nodes and initialize indices
-        nodes = list(self.G)
-        num_nodes = len(nodes)
-        node_indices = {node: idx for idx, node in enumerate(nodes)}
+        num_nodes = len(self.G)
+        node_indices = {node: idx for idx, node in enumerate(self.G)}
 
         # Initialize path weights and node chains
         pathWeights = [[math.inf] * num_nodes for _ in range(num_nodes)]
@@ -246,17 +245,3 @@ class Graph:
     def countConnectedComponentsNX(self):
         return nx.number_connected_components(self.G)
     
-start_time = time.time()
-for i in range(1000):
-    graph = Graph(50, density=2, seed=(i + 37), directed=True)
-    graph.generateRandomGraph()
-    graph.randomizeWeights()
-    graph.floydWarshall()
-print("--- %s seconds ---" % (time.time() - start_time))
-start_time = time.time()
-for i in range(1000):
-    graph = Graph(50, density=2, seed=(i + 37), directed=True)
-    graph.generateRandomGraph()
-    graph.randomizeWeights()
-    graph.floysWarshallNX()
-print("--- %s seconds ---" % (time.time() - start_time))
