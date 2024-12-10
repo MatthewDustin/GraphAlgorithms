@@ -13,7 +13,7 @@ class Graph:
             self.node_count = 2
             print("Cannot have less than 2 nodes, defaulting to two nodes.")
         self.density = density
-        if (density < self.node_count - 1):
+        if (density > self.node_count - 1):
             self.density = node_count - 1
         
         self.G = None
@@ -155,7 +155,7 @@ class Graph:
             end = nodeChains[start][end]
             trace.insert(0, end)
 
-        print(trace)
+        return trace
         
         
 
