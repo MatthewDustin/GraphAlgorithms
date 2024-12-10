@@ -88,8 +88,8 @@ class Graph:
             for (u, v) in sorted:
                 if not spanningTree.has_node(u) or not spanningTree.has_node(v):
                     spanningTree.add_edge(u, v)
-                    spanningTree.add_node(u)
-                    spanningTree.add_node(v)
+                    #spanningTree.add_node(u)
+                    #spanningTree.add_node(v)
                 if nx.number_of_nodes(spanningTree) == nx.number_of_nodes(self.G):
                     break
             return spanningTree
