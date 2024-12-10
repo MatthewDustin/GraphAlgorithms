@@ -101,7 +101,7 @@ class Graph:
     
     def floydWarshall(self):
         # Get nodes and initialize indices
-        nodes = list(self.G.nodes())
+        nodes = list(self.G)
         num_nodes = len(nodes)
         node_indices = {node: idx for idx, node in enumerate(nodes)}
 
