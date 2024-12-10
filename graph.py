@@ -1,6 +1,7 @@
 import networkx as nx
 import math  
 import random
+import time
 
 class Graph:
   
@@ -141,6 +142,9 @@ class Graph:
 
         return (nodeChains, pathWeights)
 
+    def floysWarshallNX(self):
+        return nx.floyd_warshall_numpy(self.G, weight='weight')
+
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
         print(f"Shortest path from {start} to {end}")
         trace = [end]
@@ -222,7 +226,6 @@ class Graph:
         depth = [0] * self.node_count
 
         def find(node):
-            """Find also performs path compression using the assignment. This makes the tree flat and the find operation O(1) amortized."""
             if root[node] != node:
                 root[node] = find(root[node])
             return root[node]
@@ -251,3 +254,5 @@ class Graph:
         '''Count all roots. Creating a set is unnecessary.'''
         return sum(1 for node in rangeNodeCount if root[node] == node)
     
+    def countConnectedComponentsNX(self):
+        return nx.number_connected_components(self.G)
