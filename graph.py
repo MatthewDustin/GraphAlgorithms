@@ -94,6 +94,9 @@ class Graph:
                     break
             return spanningTree
     
+    def kruskalNX(self):
+        return nx.minimum_spanning_tree(self.G)
+    
     def floydWarshall(self):
 
         K = self.G.to_directed()
