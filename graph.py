@@ -105,16 +105,6 @@ class Graph:
         nodeChains = [[-1 for x in R] for a in R]
         # arr[:][:] = math.inf
 
-        def printArrArr(array: list[list[float]]):
-            for i in range(len(array)):
-                for j in range(len(array)):
-                    if(array[i][j] == math.inf):
-                        print("%5s" % ("IF"), end="")
-                    else:
-                        print("%5d" % (array[i][j]), end="")
-                    if j == len(array)-1:
-                        print()        
-
         for (s, d, w) in K.edges.data("weight"):
             #initialize weights for directly connected nodes
             #mirrors diagonally since we're using an undirected graph
