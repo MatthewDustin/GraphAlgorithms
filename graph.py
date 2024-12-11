@@ -45,11 +45,9 @@ class Graph:
         
 
     def randomizeWeights(self, minimum=0, offset=10):
-        minWeight = min(minimum, minimum+offset)
-        maxWeight = max(minimum, minimum+offset)
         random.seed(self.seed)
         for (u, v, w) in self.graph.edges.data():
-            self.graph.edges[u, v]['weight'] = random.randint(minWeight, maxWeight)
+            self.graph.edges[u, v]['weight'] = random.randint(minimum, minimum + offset)
 
     def getWeight(self, edge: tuple):
         return self.graph.edges[edge[0], edge[1]]["weight"]
