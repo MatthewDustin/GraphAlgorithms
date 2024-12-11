@@ -2,11 +2,12 @@ import networkx as nx
 import math  
 import random
 import time
+import heapq
 
 import numpy as np
 
 class Graph:
-  
+    
     def __init__(self, node_count: int, density=1 , directed=False, seed: int | None = None):
         self.directed = directed
         self.node_count = node_count
@@ -81,20 +82,43 @@ class Graph:
         return list(self.G.edges.data('weight'))
 
     def getSortedEdges(self):
-        return sorted(self.G.edges, key=self.getWeight)
+        return sorted(self.G.edges.data('weight'), key=self.getWeight)
 
     def kruskal(self):
-            spanningTree = nx.Graph()
-            sorted = self.getSortedEdges()
+            spanningEdges = []
+            print(sorted)
+            clusters = dict()
+            queue = self.getSortedEdges()
+            totalWeight = 0
+            # for (u, v, w) in self.G.edges.data("weight"):
+            #     heapq.heappush(queue, (w, (u, v)))
+            
+            for node in self.G.nodes:
+                clusters.update({node: {node}})
 
-            for (u, v) in sorted:
-                if not spanningTree.has_node(u) or not spanningTree.has_node(v):
-                    spanningTree.add_edge(u, v)
-                    #spanningTree.add_node(u)
-                    #spanningTree.add_node(v)
-                if nx.number_of_nodes(spanningTree) == nx.number_of_nodes(self.G):
-                    break
-            return spanningTree
+            while len(clusters[1]) < self.G.number_of_nodes():
+                #if the queue is empty then no spanning tree exists
+                if (len(queue) < 1): return (False, spanningEdges, totalWeight)
+                
+                (u, v, w) = queue.pop(0)
+                print(f"{u}, {v}, {w}")
+                if clusters[u] != clusters[v]:
+                    spanningEdges.append((u, v, w))
+                    totalWeight += w
+                    c = clusters[u]
+                    c.update(clusters[v])
+                    clusters.update({u: c})
+                    clusters.update({v: c})
+                
+            return (True, spanningEdges, totalWeight)
+    
+    
+    
+    
+    
+    
+    
+    
     
     def kruskalNX(self):
         return nx.minimum_spanning_tree(self.G)

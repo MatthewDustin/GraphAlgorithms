@@ -5,7 +5,7 @@ from GUI2 import *
 #_graph = Graph(node_count = 300, density=15, directed=False)
 
 
-DEFAULT_NODECOUNT = 100
+DEFAULT_NODECOUNT = 1000
 DEFAULT_DENSITY = 4
 DEFAULT_DIRECTED = False
 DEFAULT_SEED = None
@@ -95,10 +95,12 @@ def testKruskal(
     G = Graph(node_count, density, seed=seed)
     G.generateConnectedGraph()
     G.randomizeWeights()
-    nets = nx.minimum_spanning_tree(G.G)
+    nets= nx.minimum_spanning_tree(G.G)
     kruskals = G.kruskal()
-    print(f'networkx: {sorted(nets.edges)}')
-    print(f'kruskals: {sorted(kruskals.edges)}')
+    print(G.countConnectedComponentsNX())
+    #get a weird error if I put this directly in the print statement
+    s = int(nets.size("weight"))
+    print(f"Single spanning tree exists?: {kruskals[0]} networkx: {s} kruskals: {kruskals[2]}")
 
 
 
@@ -106,9 +108,9 @@ def testKruskal(
 # testConnectedComponents()
 # testSorts()
 # testWeights()
-# testKruskal()
+testKruskal(density=1)
 # testFloydWarshall()
-testVertexCover(seed = None)
+# testVertexCover(seed = None)
 
 
 #print(nx.write_network_text(_graph.G))
