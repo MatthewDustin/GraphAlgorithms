@@ -1,11 +1,9 @@
 import networkx as nx
-import networkx.algorithms.approximation.vertex_cover as vc
 import math  
 import random
 import time
 import heapq
 from typing import Callable
-from networkx.algorithms.approximation import min_weighted_vertex_cover
 
 
 import numpy as np
@@ -39,7 +37,6 @@ class Graph:
     
     def generate(self):
         edge_count = (self.node_count * self.density) * (1 if self.directed else .5)
-        
         self.graph = self.graphGenerator(
             self.node_count,
             edge_count, 
@@ -68,17 +65,13 @@ class Graph:
 
     def kruskal(self):
             spanningEdges = []
-            clusters = dict()
+            clusters = {node: {node} for node in self.graph.nodes}
             queue = self.getSortedEdges()
             totalWeight = 0
-            
-
-            for node in self.graph.nodes:
-                clusters.update({node: {node}})
 
             while len(clusters[1]) < self.graph.number_of_nodes():
                 #if the queue is empty then no single spanning tree exists
-                if (len(queue) < 1): return (False, spanningEdges, totalWeight)
+                if not queue: return (False, spanningEdges, totalWeight)
                 (u, v, w) = queue.pop(0)
                 
                 if clusters[u] != clusters[v]:
@@ -241,7 +234,7 @@ class Graph:
     
 start_time = time.time()
 for i in range(1000):
-    graph = Graph(250, density=2, seed=(i + 37), directed=False)
+    graph = Graph(250, density=4, seed=(i + 37), directed=False)
     graph.vertexCover()
 print("--- %s seconds ---" % (time.time() - start_time))
 start_time = time.time()
