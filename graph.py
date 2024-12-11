@@ -28,7 +28,7 @@ class Graph:
             print("Too many edges for given vertice count")
             self.density = node_count - 1
         
-        self.graph : nx.Graph
+        self.graph : nx.Graph | nx.DiGraph
         self.generate()
 
     def copy(self): 
