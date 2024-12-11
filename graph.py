@@ -28,7 +28,7 @@ class Graph:
             print("Too many edges for given vertice count")
             self.density = node_count - 1
         
-        self.graph = None
+        self.graph : nx.Graph
         self.generate()
 
     def copy(self): 
@@ -242,13 +242,11 @@ class Graph:
 start_time = time.time()
 for i in range(1000):
     graph = Graph(250, density=2, seed=(i + 37), directed=False)
-    graph.generateRandomGraph()
     graph.vertexCover()
 print("--- %s seconds ---" % (time.time() - start_time))
 start_time = time.time()
 for i in range(1000):
     graph = Graph(250, density=2, seed=(i + 37), directed=False)
-    graph.generateRandomGraph()
     graph.vertexCoverNX()
 print("--- %s seconds ---" % (time.time() - start_time))
 
