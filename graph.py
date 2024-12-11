@@ -130,41 +130,23 @@ class Graph:
             trace.insert(0, end)
 
         return trace
-
-
+    
     def vertexCover(self):
         vertices = set()
         remainingEdges = set(self.graph.edges)
-
-        def uncoveredEdges(node: int):
-            uncoveredEdges = [edge for edge in remainingEdges if node in edge]
-            return uncoveredEdges
+        connectedEdges = {}
         
-        #first adds the incident node with the greater number of uncovered incident edges
-        #if the next node still has uncovered edges it is added as well
-        def addOptimalNodes(edge: tuple):
-            if len(uncoveredEdges(edge[0])) < len(uncoveredEdges(edge[1])): 
-                edge = (edge[1], edge[0])
-
-            vertices.add(edge[0])
-            #coveredNodes.append(edge[0])
-            #removeCoveredEdges can be called before including the node because it wont remove anything if the node shouldn't be included
-            #avoids including the node when it wouldn't cover any new edges, e.g. leaf nodes
-            if removeCoveredEdges(edge[1]) > 0:
-                vertices.add(edge[1])
-        
-        #removes from remainingEdges any edge that is covered by the node provided
-        #returns the number of new edges covered
-        def removeCoveredEdges(node: int):
-            covers = [e for e in remainingEdges if node in e]
-            remainingEdges.difference_update(covers)
-            #coveredEdges.update(covers)
-            #if len(covers) > 0: print(f"removing: {covers}")
-            return len(covers)
+        for (u, v) in self.graph.edges:
+            connectedEdges.update({u: (u, v)})
+            connectedEdges.update({v: (u, v)}) 
 
         while len(remainingEdges) > 0:
-            edge = remainingEdges.pop()
-            addOptimalNodes(edge)
+            (u, v) = remainingEdges.pop()
+            
+            vertices.add(u)
+            remainingEdges.difference_update(connectedEdges[u])
+            vertices.add(v)
+            remainingEdges.difference_update(connectedEdges[v])
 
 
 
