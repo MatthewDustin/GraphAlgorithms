@@ -1,4 +1,5 @@
 import networkx as nx
+import networkx.algorithms.approximation.vertex_cover as vc
 import math  
 import random
 import time
@@ -19,7 +20,7 @@ class Graph:
             self.density = node_count - 1
         
         self.G = None
-
+    
     def copy(self): 
         newG = self.G.copy()
         graph = Graph(self.node_count, self.density, self.directed, seed=self.seed)
@@ -33,7 +34,7 @@ class Graph:
             m=self.node_count * self.density * .5,
             seed = self.seed
         )
-        
+    
     def generateConnectedGraph(self):
         self.G = nx.DiGraph(weight=0) if self.directed else nx.Graph(weight=0)
         if self.node_count < 1:
@@ -100,21 +101,17 @@ class Graph:
         return nx.minimum_spanning_tree(self.G)
     
     def floydWarshall(self):
-        # Get nodes and initialize indices
         num_nodes = len(self.G)
         node_indices = {node: idx for idx, node in enumerate(self.G)}
 
-        # Initialize path weights and node chains
         pathWeights = [[math.inf] * num_nodes for _ in range(num_nodes)]
         nodeChains = [[-1] * num_nodes for _ in range(num_nodes)]
 
-        # Set weights from edges
         for s, d, w in self.G.edges.data("weight", default=math.inf):
             s_idx, d_idx = node_indices[s], node_indices[d]
             pathWeights[s_idx][d_idx] = w
             nodeChains[s_idx][d_idx] = s_idx
 
-        # Set diagonal to zero
         for i in range(num_nodes):
             pathWeights[i][i] = 0
             nodeChains[i][i] = i
@@ -189,6 +186,8 @@ class Graph:
             #print(f"coveredNodes: {coveredNodes}")            
         return vertices
     
+    def vertexCoverNX(self):
+        return vc.min_weighted_vertex_cover(self.G)
 
     def countConnectedComponents(self):
         visited = set()
@@ -245,3 +244,15 @@ class Graph:
     def countConnectedComponentsNX(self):
         return nx.number_connected_components(self.G)
     
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(250, density=2, seed=(i + 37), directed=False)
+    graph.generateRandomGraph()
+    graph.vertexCover()
+print("--- %s seconds ---" % (time.time() - start_time))
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(250, density=2, seed=(i + 37), directed=False)
+    graph.generateRandomGraph()
+    graph.vertexCoverNX()
+print("--- %s seconds ---" % (time.time() - start_time))
