@@ -3,12 +3,19 @@ import math
 import random
 import time
 import heapq
+from typing import Callable
+from networkx.algorithms.approximation import min_weighted_vertex_cover
+
 
 import numpy as np
 
 class Graph:
-    
-    def __init__(self, node_count: int, density=1 , directed=False, seed: int | None = None):
+    def __init__(self, node_count: int, 
+                density=1,
+                directed=False, 
+                seed: int | None = None, 
+                graphGenerator : Callable[[int, int, int, bool], any] = nx.gnm_random_graph):
+        self.graphGenerator = graphGenerator
         self.directed = directed
         self.node_count = node_count
         self.seed = seed
@@ -17,123 +24,90 @@ class Graph:
             print("Cannot have less than 2 nodes, defaulting to two nodes.")
         self.density = density
         if (density > self.node_count - 1):
+            print("Too many edges for given vertice count")
             self.density = node_count - 1
         
-        self.G = None
+        self.graph = None
+        self.generate()
 
     def copy(self): 
-        newG = self.G.copy()
+        newGraph = self.graph.copy()
         graph = Graph(self.node_count, self.density, self.directed, seed=self.seed)
-        graph.G = newG
+        graph.graph = newGraph
         return graph
     
-    def generateRandomGraph(self):
-    
-        self.G = nx.gnm_random_graph(
-            n=self.node_count,
-            m=self.node_count * self.density * .5,
-            seed = self.seed
-        )
+    def generate(self):
+        edge_count = (self.node_count * self.density) * (1 if self.directed else .5)
         
-    def generateConnectedGraph(self):
-        self.G = nx.DiGraph(weight=0) if self.directed else nx.Graph(weight=0)
-        if self.node_count < 1:
-            return
-        self.G.add_node(0)
-
-        random.seed(self.seed)
+        self.graph = self.graphGenerator(
+            self.node_count,
+            edge_count, 
+            self.seed,
+            self.directed)
         
-        for i in range(1, self.node_count):
-            #creates list containing a random node key and the node key being added
-            temp = random.choices(  
-                        list(self.G.nodes),
-                        [(w / (i+1)) for w in range(1, i+1)],  #first element's weight should decrease base on how many times it's been in the pool
-                        k=1)
-            temp.append(i)
-            
-            #random order only matters when the graph is directed
-            if self.directed:
-                random.shuffle(temp)
-            
-            self.G.add_node(i)
-            self.G.add_edge(temp[0], temp[1], weight=1)
-
-        target_edge_count = (self.node_count * self.density) * (1 if self.directed else .5)
-        
-        
-        while (self.G.number_of_edges() < target_edge_count):
-            temp = random.sample(list(self.G.nodes), 2)
-            self.G.add_edge(temp[0], temp[1], weight=1)
 
     def randomizeWeights(self, minimum=0, offset=10):
         minWeight = min(minimum, minimum+offset)
         maxWeight = max(minimum, minimum+offset)
         random.seed(self.seed)
-        for (u, v, w) in self.G.edges.data():
-            self.G.edges[u, v]['weight'] = random.randint(minWeight, maxWeight)
+        for (u, v, w) in self.graph.edges.data():
+            self.graph.edges[u, v]['weight'] = random.randint(minWeight, maxWeight)
 
     def getWeight(self, edge: tuple):
-        return self.G.edges[edge[0], edge[1]]["weight"]
+        return self.graph.edges[edge[0], edge[1]]["weight"]
     
     def setWeight(self, edge: tuple, new_weight):
-        self.G.edges[edge[0], edge[1]]["weight"] = new_weight
+        self.graph.edges[edge[0], edge[1]]["weight"] = new_weight
 
     def listWeights(self):
-        return list(self.G.edges.data('weight'))
+        return list(self.graph.edges.data('weight'))
 
     def getSortedEdges(self):
-        return sorted(self.G.edges.data('weight'), key=self.getWeight)
+        return sorted(self.graph.edges.data('weight'), key=self.getWeight)
 
     def kruskal(self):
             spanningEdges = []
-            print(sorted)
             clusters = dict()
             queue = self.getSortedEdges()
             totalWeight = 0
-            # for (u, v, w) in self.G.edges.data("weight"):
-            #     heapq.heappush(queue, (w, (u, v)))
             
-            for node in self.G.nodes:
+
+            for node in self.graph.nodes:
                 clusters.update({node: {node}})
 
-            while len(clusters[1]) < self.G.number_of_nodes():
-                #if the queue is empty then no spanning tree exists
+            while len(clusters[1]) < self.graph.number_of_nodes():
+                #if the queue is empty then no single spanning tree exists
                 if (len(queue) < 1): return (False, spanningEdges, totalWeight)
-                
                 (u, v, w) = queue.pop(0)
-                print(f"{u}, {v}, {w}")
+                
                 if clusters[u] != clusters[v]:
                     spanningEdges.append((u, v, w))
                     totalWeight += w
-                    c = clusters[u]
+                    
+                    c = clusters[u] 
                     c.update(clusters[v])
-                    clusters.update({u: c})
-                    clusters.update({v: c})
+                    # print(f"Merging {u}:{clusters[u]} and {v}:{clusters[v]}")
+                    # print(f"into: {c}")
+                    clusters.update(dict.fromkeys(c, c))
+
                 
             return (True, spanningEdges, totalWeight)
     
     
-    
-    
-    
-    
-    
-    
-    
     def kruskalNX(self):
-        return nx.minimum_spanning_tree(self.G)
+        return nx.minimum_spanning_tree(self.graph)
     
     def floydWarshall(self):
         # Get nodes and initialize indices
-        num_nodes = len(self.G)
-        node_indices = {node: idx for idx, node in enumerate(self.G)}
+        num_nodes = len(self.graph)
+        node_indices = {node: idx for idx, node in enumerate(self.graph)}
 
         # Initialize path weights and node chains
         pathWeights = [[math.inf] * num_nodes for _ in range(num_nodes)]
         nodeChains = [[-1] * num_nodes for _ in range(num_nodes)]
 
         # Set weights from edges
-        for s, d, w in self.G.edges.data("weight", default=math.inf):
+        for s, d, w in self.graph.edges.data("weight", default=math.inf):
             s_idx, d_idx = node_indices[s], node_indices[d]
             pathWeights[s_idx][d_idx] = w
             nodeChains[s_idx][d_idx] = s_idx
@@ -144,18 +118,19 @@ class Graph:
             nodeChains[i][i] = i
 
         # Floyd-Warshall algorithm
-        for k in range(num_nodes):
-            for i in range(num_nodes):
-                for j in range(num_nodes):
-                    compoundPath = pathWeights[i][k] + pathWeights[k][j]
-                    if pathWeights[i][j] > compoundPath:
-                        pathWeights[i][j] = compoundPath
-                        nodeChains[i][j] = nodeChains[k][j]
+        for intermediarry in range(num_nodes):
+            for source in range(num_nodes):
+                srcToInt = pathWeights[source][intermediarry]
+                for destination in range(num_nodes):
+                    compoundPath =  srcToInt + pathWeights[intermediarry][destination]
+                    if pathWeights[source][destination] > compoundPath:
+                        pathWeights[source][destination] = compoundPath
+                        nodeChains[source][destination] = nodeChains[intermediarry][destination]
 
         return nodeChains, pathWeights
 
     def floysWarshallNX(self):
-        return nx.floyd_warshall_numpy(self.G, weight='weight')
+        return nx.floyd_warshall_numpy(self.graph, weight='weight')
 
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
         #print(f"Shortest path from {start} to {end}")
@@ -165,14 +140,11 @@ class Graph:
             trace.insert(0, end)
 
         return trace
-        
-        
+
 
     def vertexCover(self):
         vertices = set()
-        remainingEdges = set(self.G.edges)
-        #coveredEdges = set() #Just for tracking, should not be needed for logic
-        #coveredNodes = list()
+        remainingEdges = set(self.graph.edges)
 
         def uncoveredEdges(node: int):
             uncoveredEdges = [edge for edge in remainingEdges if node in edge]
@@ -183,7 +155,7 @@ class Graph:
         def addOptimalNodes(edge: tuple):
             if len(uncoveredEdges(edge[0])) < len(uncoveredEdges(edge[1])): 
                 edge = (edge[1], edge[0])
-            
+
             vertices.add(edge[0])
             #coveredNodes.append(edge[0])
             #removeCoveredEdges can be called before including the node because it wont remove anything if the node shouldn't be included
@@ -202,9 +174,6 @@ class Graph:
 
         while len(remainingEdges) > 0:
             edge = remainingEdges.pop()
-            
-            #print(edge)
-
             addOptimalNodes(edge)
 
 
@@ -213,18 +182,20 @@ class Graph:
             #print(f"coveredNodes: {coveredNodes}")            
         return vertices
     
-
+    def vertexCoverNX(self):
+        return nx.algorithms.approximation.min_weighted_vertex_cover(self.graph)
+    
     def countConnectedComponents(self):
         visited = set()
         components = 0
 
         def dfs(node):
             visited.add(node)
-            for neighbor in self.G.neighbors(node):
+            for neighbor in self.graph.neighbors(node):
                 if neighbor not in visited:
                     dfs(neighbor)
         
-        for node in self.G.nodes:
+        for node in self.graph.nodes:
             if node not in visited:
                 components += 1
                 dfs(node)
@@ -256,7 +227,7 @@ class Graph:
                     depth[root1] += 1
                     root[root2] = root1
 
-        for u, v in self.G.edges:
+        for u, v in self.graph.edges:
             union(u, v)
 
         '''Not all trees are flat, so we repeat the find operation on all nodes'''
@@ -267,5 +238,44 @@ class Graph:
         return sum(1 for node in rangeNodeCount if root[node] == node)
     
     def countConnectedComponentsNX(self):
-        return nx.number_connected_components(self.G)
+        return nx.number_connected_components(self.graph)
     
+
+
+    # def generateConnectedGraph(self):
+    #     self.graph = nx.DiGraph(weight=0) if self.directed else nx.Graph(weight=0)
+    #     if self.node_count < 1:
+    #         return
+    #     self.G.add_node(0)
+
+    #     random.seed(self.seed)
+        
+    #     for i in range(1, self.node_count):
+    #         #creates list containing a random node key and the node key being added
+    #         temp = random.choices(  
+    #                     list(self.G.nodes),
+    #                     [(w / (i+1)) for w in range(1, i+1)],  #first element's weight should decrease base on how many times it's been in the pool
+    #                     k=1)
+    #         temp.append(i)
+            
+    #         #random order only matters when the graph is directed
+    #         if self.directed:
+    #             random.shuffle(temp)
+            
+    #         self.G.add_node(i)
+    #         self.G.add_edge(temp[0], temp[1], weight=1)
+
+    #     target_edge_count = (self.node_count * self.density) * (1 if self.directed else .5)
+        
+        
+    #     while (self.G.number_of_edges() < target_edge_count):
+    #         temp = random.sample(list(self.G.nodes), 2)
+    #         self.G.add_edge(temp[0], temp[1], weight=1)
+            
+    # def generateRandomGraph(self):
+    
+    #     self.G = nx.gnm_random_graph(
+    #         n=self.node_count,
+    #         m=self.node_count * self.density * .5,
+    #         seed = self.seed
+    #     )

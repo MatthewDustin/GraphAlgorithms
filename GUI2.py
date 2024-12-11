@@ -39,14 +39,12 @@ class GraphUI(tk.Tk):
             return
 
         self.graph = Graph(node_count, density, directed)
-        self.graph.generateRandomGraph()
         if random_weights: 
             self.graph.randomizeWeights()
 
     def create_graph_no_GUI(self, node_count, density, directed=False, seed: int | None = None):
 
         self.graph = Graph(node_count, density, directed, seed)
-        self.graph.generateRandomGraph()
         self.graph.randomizeWeights()
 
 
@@ -60,7 +58,7 @@ class GraphUI(tk.Tk):
         weight = simpledialog.askfloat("Input", "Enter weight:")
         
         if u is not None and v is not None and weight is not None:
-            self.graph.G.add_edge(u, v, weight)
+            self.graph.graph.add_edge(u, v, weight)
             self.output_area.insert(tk.END, f"Edge added: {u} -- {v} (Weight: {weight})\n")
 
     def get_shortest_path(self):
@@ -84,7 +82,7 @@ class GraphUI(tk.Tk):
         v = simpledialog.askinteger("Input", "Enter ending node (v):")
 
         if u is not None and v is not None:
-            self.graph.G.remove_edge(u, v)
+            self.graph.graph.remove_edge(u, v)
             self.output_area.insert(tk.END, f"Edge deleted: {u} -- {v}\n")
 
     def edit_weight(self):
@@ -126,8 +124,8 @@ class GraphUI(tk.Tk):
 
         fig, ax = plt.subplots()
 
-        nx.draw(self.graph.G, pos, with_labels=True, node_size=700, node_color='lightblue', ax=ax)
-        edges = nx.draw_networkx_edges(self.graph.G, pos, edge_color=edge_colors, width=2, ax=ax)
+        nx.draw(self.graph.graph, pos, with_labels=True, node_size=700, node_color='lightblue', ax=ax)
+        edges = nx.draw_networkx_edges(self.graph.graph, pos, edge_color=edge_colors, width=2, ax=ax)
 
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=min_weight, vmax=max_weight))
         sm.set_array([])
@@ -137,7 +135,7 @@ class GraphUI(tk.Tk):
         cursor = mplcursors.cursor(edges, hover=2)
 
         cursor.connect("add", lambda sel: sel.annotation.set_text(
-            f"Weight: {self.graph.G[edge_labels[sel.index[0]][0]][edge_labels[sel.index[0]][1]]['weight']}\nEdge: {edge_labels[sel.index[0]][0]} -- {edge_labels[sel.index[0]][1]}"
+            f"Weight: {self.graph.graph[edge_labels[sel.index[0]][0]][edge_labels[sel.index[0]][1]]['weight']}\nEdge: {edge_labels[sel.index[0]][0]} -- {edge_labels[sel.index[0]][1]}"
         ))
 
         # Clear tooltip when not hovering
