@@ -122,7 +122,7 @@ class Graph:
         return nodeChains, pathWeights
 
     def floysWarshallNX(self):
-        return nx.floyd_warshall_numpy(self.graph, weight='weight')
+        return nx.floyd_warshall(self.graph, weight='weight')
 
     def getShortestPath(start: int, end: int, nodeChains: list[list[float]]):
         #print(f"Shortest path from {start} to {end}")
@@ -231,18 +231,21 @@ class Graph:
     
     def countConnectedComponentsNX(self):
         return nx.number_connected_components(self.graph)
-    
-start_time = time.time()
-for i in range(1000):
-    graph = Graph(250, density=4, seed=(i + 37), directed=False)
-    graph.vertexCover()
-print("--- %s seconds ---" % (time.time() - start_time))
-start_time = time.time()
-for i in range(1000):
-    graph = Graph(250, density=2, seed=(i + 37), directed=False)
-    graph.vertexCoverNX()
-print("--- %s seconds ---" % (time.time() - start_time))
 
+'''
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(75, density=3, seed=(i + 37), directed=False)
+    graph.randomizeWeights()
+    graph.floydWarshall()
+print("--- %s seconds ---" % (time.time() - start_time))
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(75, density=3, seed=(i + 37), directed=False)
+    graph.randomizeWeights()
+    graph.floysWarshallNX()
+print("--- %s seconds ---" % (time.time() - start_time))
+'''   
 
     # def generateConnectedGraph(self):
     #     self.graph = nx.DiGraph(weight=0) if self.directed else nx.Graph(weight=0)

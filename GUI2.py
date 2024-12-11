@@ -138,7 +138,6 @@ class GraphUI(tk.Tk):
             f"Weight: {self.graph.graph[edge_labels[sel.index[0]][0]][edge_labels[sel.index[0]][1]]['weight']}\nEdge: {edge_labels[sel.index[0]][0]} -- {edge_labels[sel.index[0]][1]}"
         ))
 
-        # Clear tooltip when not hovering
         cursor.connect("remove", lambda sel: sel.annotation.set_visible(False))
 
         plt.title("Graph Visualization")
