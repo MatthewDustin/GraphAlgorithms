@@ -71,6 +71,7 @@ class GraphUI(tk.Tk):
             return
 
         kruskal = self.graph.kruskal()
+        self.output_area.delete(1.0, tk.END)
         self.output_area.insert(tk.END, f"Minimum Spanning Tree (Kruskal): {kruskal}\n")
         
     def get_floyd(self):
@@ -79,6 +80,7 @@ class GraphUI(tk.Tk):
             return
 
         floyd = self.graph.floydWarshall()
+        self.output_area.delete(1.0, tk.END)
         self.output_area.insert(tk.END, f"Floyd Warshall: {floyd[0]}\n")
         
     def get_components(self):
@@ -87,6 +89,7 @@ class GraphUI(tk.Tk):
             return
 
         components = self.graph.countConnectedComponents()
+        self.output_area.delete(1.0, tk.END)
         self.output_area.insert(tk.END, f"Number of Components: {components}\n")
 
     def get_cover(self):
@@ -95,6 +98,7 @@ class GraphUI(tk.Tk):
             return
 
         cover = self.graph.vertexCover()
+        self.output_area.delete(1.0, tk.END)
         self.output_area.insert(tk.END, f"Vertex Cover: {cover}\n")
 
     def get_shortest_path(self):
@@ -107,7 +111,8 @@ class GraphUI(tk.Tk):
 
         if u is not None and v is not None:
             warshall = self.graph.floydWarshall()
-            Graph.getShortestPath(u, v, warshall[0])
+            self.output_area.delete(1.0, tk.END)
+            self.output_area.insert(tk.END, f"Shortest Path from {u} to {v}: {warshall[1][u][v]}\n")
 
     def delete_edge(self):
         if self.graph is None:
