@@ -24,6 +24,10 @@ class GraphUI(tk.Tk):
         tk.Button(self, text="Edit Weight", command=self.edit_weight).pack(pady=5)
         tk.Button(self, text="Render Graph", command=self.render_graph).pack(pady=5)
         tk.Button(self, text="Shortest Path", command = self.get_shortest_path).pack(pady=5)
+        tk.Button(self, text="Kruskal", command = self.get_kruskal).pack(pady=5)
+        tk.Button(self, text="Floyd Warshal", command = self.get_floyd).pack(pady=5)
+        tk.Button(self, text="Count Componenets", command = self.get_components).pack(pady=5)
+        tk.Button(self, text="Vertex Cover", command = self.get_cover).pack(pady=5)
         tk.Button(self, text="Exit", command=self.quit).pack(pady=5)
 
         self.output_area = tk.Text(self, height=15, width=70)
@@ -60,6 +64,38 @@ class GraphUI(tk.Tk):
         if u is not None and v is not None and weight is not None:
             self.graph.graph.add_edge(u, v, weight)
             self.output_area.insert(tk.END, f"Edge added: {u} -- {v} (Weight: {weight})\n")
+
+    def get_kruskal(self):
+        if self.graph is None:
+            messagebox.showerror("Error", "Please create a graph first.")
+            return
+
+        kruskal = self.graph.kruskal()
+        self.output_area.insert(tk.END, f"Minimum Spanning Tree (Kruskal): {kruskal}\n")
+        
+    def get_floyd(self):
+        if self.graph is None:
+            messagebox.showerror("Error", "Please create a graph first.")
+            return
+
+        floyd = self.graph.floydWarshall()
+        self.output_area.insert(tk.END, f"Floyd Warshall: {floyd[0]}\n")
+        
+    def get_components(self):
+        if self.graph is None:
+            messagebox.showerror("Error", "Please create a graph first.")
+            return
+
+        components = self.graph.countConnectedComponents()
+        self.output_area.insert(tk.END, f"Number of Components: {components}\n")
+
+    def get_cover(self):
+        if self.graph is None:
+            messagebox.showerror("Error", "Please create a graph first.")
+            return
+
+        cover = self.graph.vertexCover()
+        self.output_area.insert(tk.END, f"Vertex Cover: {cover}\n")
 
     def get_shortest_path(self):
         if self.graph is None:
