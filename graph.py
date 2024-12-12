@@ -6,7 +6,6 @@ import heapq
 from typing import Callable
 
 
-import numpy as np
 
 class Graph:
     def __init__(self, node_count: int, 
@@ -181,11 +180,11 @@ class Graph:
 
         def dfs(node):
             visited.add(node)
-            for neighbor in self.graph.neighbors(node):
+            for neighbor in self.graph._adj[node]:
                 if neighbor not in visited:
                     dfs(neighbor)
         
-        for node in self.graph.nodes:
+        for node in self.graph:
             if node not in visited:
                 components += 1
                 dfs(node)
@@ -230,20 +229,14 @@ class Graph:
     def countConnectedComponentsNX(self):
         return nx.number_connected_components(self.graph)
 
-'''
+
+
 start_time = time.time()
 for i in range(1000):
-    graph = Graph(75, density=3, seed=(i + 37), directed=False)
-    graph.randomizeWeights()
-    graph.floydWarshall()
+    graph = Graph(1000, density=2, seed=(i + 37), directed=False)
+    graph.vertexCover()
 print("--- %s seconds ---" % (time.time() - start_time))
-start_time = time.time()
-for i in range(1000):
-    graph = Graph(75, density=3, seed=(i + 37), directed=False)
-    graph.randomizeWeights()
-    graph.floysWarshallNX()
-print("--- %s seconds ---" % (time.time() - start_time))
-'''   
+
 
     # def generateConnectedGraph(self):
     #     self.graph = nx.DiGraph(weight=0) if self.directed else nx.Graph(weight=0)
