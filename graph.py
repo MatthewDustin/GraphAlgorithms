@@ -133,11 +133,16 @@ class Graph:
     def vertexCover(self):
         vertices = set()
         remainingEdges = set(self.graph.edges)
-        connectedEdges = {}
-        
+        connectedEdges = dict()
+        print(remainingEdges)
         for (u, v) in self.graph.edges:
-            connectedEdges.update({u: (u, v)})
-            connectedEdges.update({v: (u, v)}) 
+            U = connectedEdges.setdefault(u, [])
+            U.append((u, v))
+            V = connectedEdges.setdefault(v, [])
+            V.append((u, v))
+
+            connectedEdges.update({u: U})
+            connectedEdges.update({v: V}) 
 
         while len(remainingEdges) > 0:
             (u, v) = remainingEdges.pop()
@@ -147,10 +152,6 @@ class Graph:
             vertices.add(v)
             remainingEdges.difference_update(connectedEdges[v])
 
-
-
-            #print(f"edge: {edge} \nremainingEdges: {remainingEdges}")
-            #print(f"coveredNodes: {coveredNodes}")            
         return vertices
     
     def vertexCoverNX(self):
