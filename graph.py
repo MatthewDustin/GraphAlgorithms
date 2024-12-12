@@ -54,9 +54,6 @@ class Graph:
     def setWeight(self, edge: tuple, new_weight):
         self.graph.edges[edge[0], edge[1]]["weight"] = new_weight
 
-    def listWeights(self):
-        return list(self.graph.edges.data('weight'))
-
     def getSortedEdges(self):
         return sorted(self.graph.edges.data('weight'), key=self.getWeight)
 

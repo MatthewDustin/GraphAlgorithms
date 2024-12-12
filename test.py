@@ -2,7 +2,6 @@ import numpy
 import networkx as nx
 from graph import *
 from GUI2 import *
-#_graph = Graph(node_count = 300, density=15, directed=False)
 
 
 DEFAULT_NODECOUNT = 1000
@@ -40,13 +39,13 @@ def testWeights(
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
     
-    G = Graph(node_count, directed, density, seed)
-    G.generateConnectedGraph()
+    G = Graph(node_count, density=density, seed=seed, directed=directed)
     G.randomizeWeights()
-    G.randomizeWeights(11, -2)
-    print(G.listWeights()[0])
-    edge = G.listWeights()[0]
+    G.randomizeWeights(11, 2)
+    # get random edge
+    edge = random.choice(list(G.graph.edges))
     print(G.getWeight(edge))
+    
     G.setWeight(edge, 5)
     print(G.getWeight(edge))
 
@@ -56,7 +55,7 @@ def testSorts(
         directed = DEFAULT_DIRECTED,
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
-    G = Graph(node_count, directed, density)
+    G = Graph(node_count, density=density, seed=seed, directed=directed)
     G.randomizeWeights()
     print(G.listWeights())
     print(G.getSortedEdges())
@@ -67,7 +66,7 @@ def testFloydWarshallFor(
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
     
-    G = Graph(node_count, density, graphGenerator=graphGenerator)
+    G = Graph(node_count, density=density, graphGenerator=graphGenerator)
     G.randomizeWeights()
     
     nets = nx.floyd_warshall_numpy(G.graph).tolist()
@@ -81,7 +80,7 @@ def testConnectedComponentsFor(
         density = DEFAULT_DENSITY,
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
-    G = Graph(node_count, density, seed=seed)
+    G = Graph(node_count, density=density, seed=seed)
     numComponents = G.countConnectedComponentsDSU()
     numComponentsNX = nx.number_connected_components(G.graph)
     status = "passed" if numComponentsNX == numComponents else "failed"
@@ -95,7 +94,7 @@ def testVertexCoverFor(
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
     
-    G = Graph(node_count, density, seed=seed)
+    G = Graph(node_count, density=density, seed=seed)
     coverSize = len(G.vertexCover())
     nxCoverSize = len(G.vertexCoverNX())
     percentDiff = (coverSize - nxCoverSize) / (((nxCoverSize + coverSize)) / 2)
@@ -110,7 +109,7 @@ def testKruskalFor(
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
     
-    G = Graph(node_count, density, seed=seed, graphGenerator=graphGenerator)
+    G = Graph(node_count, density=density, seed=seed, graphGenerator=graphGenerator)
     G.randomizeWeights()
     
     nets= nx.minimum_spanning_tree(G.graph)
