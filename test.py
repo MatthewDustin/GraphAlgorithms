@@ -55,13 +55,13 @@ def testSorts(
         directed = DEFAULT_DIRECTED,
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
-    G = Graph(node_count, density=density, seed=seed, directed=directed)
+    G = Graph(15, density=density, seed=seed, directed=directed)
     G.randomizeWeights()
     print(G.listWeights())
     print(G.getSortedEdges())
 
 def testFloydWarshallFor(
-        node_count = DEFAULT_NODECOUNT,
+        node_count = 45,
         density = DEFAULT_DENSITY,
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
