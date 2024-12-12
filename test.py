@@ -82,7 +82,7 @@ def testConnectedComponentsFor(
         seed = DEFAULT_SEED,
         graphGenerator = DEFAULT_GRAPH_GENERATOR):
     G = Graph(node_count, density, seed=seed)
-    numComponents = G.countConnectedComponents()
+    numComponents = G.countConnectedComponentsDSU()
     numComponentsNX = nx.number_connected_components(G.graph)
     status = "passed" if numComponentsNX == numComponents else "failed"
     
@@ -142,12 +142,6 @@ def testFloydWarshall(seed = DEFAULT_SEED):
 
 
 # testKruskal()
-testVertexCover()
+# testVertexCover()
 # testConnectedComponents()
 # testFloydWarshall()
-
-
-
-
-
-
