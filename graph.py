@@ -178,7 +178,6 @@ class Graph:
         """This algorithm uses Disjoint Set Union. Each node starts as a tree root."""
         rangeNodeCount = range(self.node_count)
         root = list(rangeNodeCount)
-        depth = [0] * self.node_count
 
         def find(node):
             if root[node] != node:
@@ -190,14 +189,7 @@ class Graph:
             root2 = find(node2)
 
             if root1 != root2:
-                '''Attach the smaller tree to the root of the larger tree'''
-                if depth[root1] > depth[root2]:
-                    root[root2] = root1
-                elif depth[root1] < depth[root2]:
-                    root[root1] = root2
-                else:
-                    depth[root1] += 1
-                    root[root2] = root1
+                root[root2] = root1
 
         for u, v in self.graph.edges:
             union(u, v)
@@ -213,14 +205,18 @@ class Graph:
         return nx.number_connected_components(self.graph)
 
 
-
+'''
 start_time = time.time()
 for i in range(1000):
-    graph = Graph(1000, density=2, seed=(i + 37), directed=False)
-    graph.vertexCover()
+    graph = Graph(250, density=2, seed=(i + 37), directed=False)
+    graph.countConnectedComponents()
 print("--- %s seconds ---" % (time.time() - start_time))
-
-
+start_time = time.time()
+for i in range(1000):
+    graph = Graph(250, density=2, seed=(i + 37), directed=False)
+    graph.countConnectedComponentsNX()
+print("--- %s seconds ---" % (time.time() - start_time))
+'''
     # def generateConnectedGraph(self):
     #     self.graph = nx.DiGraph(weight=0) if self.directed else nx.Graph(weight=0)
     #     if self.node_count < 1:
