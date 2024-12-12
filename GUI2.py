@@ -62,7 +62,7 @@ class GraphUI(tk.Tk):
         weight = simpledialog.askfloat("Input", "Enter weight:")
         
         if u is not None and v is not None and weight is not None:
-            self.graph.graph.add_edge(u, v, weight)
+            self.graph.graph.add_edge(u, v, weight=weight)
             self.output_area.insert(tk.END, f"Edge added: {u} -- {v} (Weight: {weight})\n")
 
     def get_kruskal(self):
@@ -136,7 +136,7 @@ class GraphUI(tk.Tk):
         new_weight = simpledialog.askfloat("Input", "Enter new weight:")
 
         if u is not None and v is not None and new_weight is not None:
-            self.graph.edit_weight(u, v, new_weight)
+            self.graph.graph[u][v]['weight'] = new_weight
             self.output_area.insert(tk.END, f"Weight of edge {u} -- {v} updated to {new_weight}.\n")
 
     def render_graph(self):
@@ -145,10 +145,10 @@ class GraphUI(tk.Tk):
             return
 
 
-        pos = nx.spring_layout(self.graph.G)  # Positions for all nodes
+        pos = nx.spring_layout(self.graph.graph)  # Positions for all nodes
 
         # Extract weights for color mapping
-        weights = [self.graph.G[u][v]['weight'] for u, v in self.graph.G.edges()]
+        weights = [self.graph.graph[u][v]['weight'] for u, v in self.graph.graph.edges()]
 
         # Normalize weights for color mapping
         min_weight = min(weights)
@@ -172,7 +172,7 @@ class GraphUI(tk.Tk):
         sm.set_array([])
         plt.colorbar(sm, ax=ax, label='Edge Weight')
 
-        edge_labels = [(u, v) for u, v in self.graph.G.edges()]
+        edge_labels = [(u, v) for u, v in self.graph.graph.edges()]
         cursor = mplcursors.cursor(edges, hover=2)
 
         cursor.connect("add", lambda sel: sel.annotation.set_text(
