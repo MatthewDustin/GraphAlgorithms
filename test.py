@@ -140,11 +140,9 @@ def testFloydWarshall(seed = DEFAULT_SEED):
     for (n, d, g) in TEST_CASES:
         testFloydWarshallFor(n, d, seed, g)
 
-testVertexCoverFor(10, 1, None, nx.gnm_random_graph)
-
 
 # testKruskal()
-# testVertexCover()
+testVertexCover()
 # testConnectedComponents()
 # testFloydWarshall()
 

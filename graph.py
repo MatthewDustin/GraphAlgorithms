@@ -134,7 +134,7 @@ class Graph:
         vertices = set()
         remainingEdges = set(self.graph.edges)
         connectedEdges = dict()
-        print(remainingEdges)
+
         for (u, v) in self.graph.edges:
             U = connectedEdges.setdefault(u, [])
             U.append((u, v))
